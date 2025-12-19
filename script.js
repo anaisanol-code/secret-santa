@@ -1,48 +1,62 @@
-const BIN_ID = "6945d5ca43b1c97be9fa0121";
-const API_KEY = "$2a$10$aO2hzVw6OCO7cl.73JIQc.EmlZu2dHu99W2h9iWfbkGHuK9EAdObe";
-const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+// 🔹 LISTE DES PARTICIPANTS (MODIFIE ICI SI BESOIN)
+const PARTICIPANTS = [
+  "Anaïs",
+  "Charmaine",
+  "Christelle",
+  "Khadidja",
+  "Gaspard",
+  "Loan",
+  "Judner"
+];
 
-async function getData() {
-  const res = await fetch(BASE_URL, {
-    headers: { "X-Master-Key": API_KEY }
-  });
-  return res.json();
+// Initialisation
+if (!localStorage.getItem("remaining")) {
+  localStorage.setItem("remaining", JSON.stringify(PARTICIPANTS));
+}
+if (!localStorage.getItem("players")) {
+  localStorage.setItem("players", JSON.stringify([]));
 }
 
-async function updateData(data) {
-  await fetch(BASE_URL, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Master-Key": API_KEY
-    },
-    body: JSON.stringify(data)
-  });
-}
-
-async function draw() {
-  const username = document.getElementById("username").value.trim();
-  const message = document.getElementById("message").value.trim();
+function drawName() {
+  const usernameInput = document.getElementById("username");
+  const username = usernameInput.value.trim();
   const result = document.getElementById("result");
 
-  if (!username) return alert("Entre ton prénom");
-
-  const data = (await getData()).record;
-
-  if (data.players[username]) {
-    return alert("🚫 Tu as déjà tiré !");
+  if (!username) {
+    result.innerText = "❌ Entre ton prénom";
+    return;
   }
 
-  const possible = data.remaining.filter(n => n !== username);
-  if (possible.length === 0) return alert("Plus personne à tirer");
+  let remaining = JSON.parse(localStorage.getItem("remaining"));
+  let players = JSON.parse(localStorage.getItem("players"));
+
+  // 🔒 Déjà joué
+  if (players.includes(username)) {
+    result.innerText = "🚫 Tu as déjà tiré, c’est fini 😌";
+    return;
+  }
+
+  // Empêcher de tomber sur soi-même
+  let possible = remaining.filter(name => name !== username);
+
+  if (possible.length === 0) {
+    result.innerText = "🎉 Plus personne à tirer";
+    return;
+  }
 
   const chosen = possible[Math.floor(Math.random() * possible.length)];
 
-  data.remaining = data.remaining.filter(n => n !== chosen);
-  data.players[username] = { message };
+  // Mise à jour
+  remaining = remaining.filter(name => name !== chosen);
+  players.push(username);
 
-  await updateData(data);
+  localStorage.setItem("remaining", JSON.stringify(remaining));
+  localStorage.setItem("players", JSON.stringify(players));
 
-  result.innerHTML = `🎁 ${chosen}`;
-  setTimeout(() => result.innerHTML = "🔒 Tirage terminé", 5000);
+  usernameInput.disabled = true;
+
+  result.innerHTML = `
+    🎁 Tu offres un cadeau à :<br>
+    <strong>${chosen}</strong>
+  `;
 }
