@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>🎄 Secret Santa</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+<div class="container">
+  <h1>🎄 Secret Santa 🎁</h1>
+
+  <input id="username" placeholder="Ton prénom">
+  <textarea id="message" placeholder="Ton message secret 💌"></textarea>
+
+  <button onclick="draw()">🎥 Tirer au sort</button>
+
+  <div id="animation" class="hidden">🎁🎄🎁</div>
+  <div id="result"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
